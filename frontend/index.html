@@ -1,63 +1,72 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pronóstico</title>
-<!--
-  ESQUELETO DEL FRONTEND
-  ======================
-  Esta página ya funciona: pide el pronóstico a la API y lo muestra en una
-  tabla sin formato. Tu trabajo es convertirla en una interfaz de verdad.
-
-  Requisitos mínimos (ver README, Fase 2):
-    1. Una gráfica con el histórico, el pronóstico y el intervalo de confianza.
-    2. Las horas en hora de Colombia (la API las entrega en UTC, con "Z").
-    3. Al menos un indicador destacado (p.ej. valor de la próxima hora,
-       máximo esperado, hora del último dato).
-    4. Controles para elegir cuántas horas pronosticar.
-    5. Un mensaje claro cuando la API responde con error.
-
-  Puedes usar cualquier librería de gráficas cargada desde un CDN
-  (Chart.js, Plotly, ECharts...) y poner archivos .css o .js en esta misma
-  carpeta: se sirven en /static/<nombre>.
-
-  Endpoints disponibles (pruébalos en /docs):
-    GET /api/prediccion?horas=12&historia=48&confianza=0.95
-    GET /api/historico?horas=48
-    GET /api/modelo
-    GET /api/salud
--->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Pronóstico horario</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script defer src="/static/activi.js"></script>
 </head>
 <body>
-  <h1>Pronóstico</h1>
-  <p id="estado">Consultando la API…</p>
-  <table border="1" cellpadding="4">
-    <thead><tr><th>tiempo (UTC)</th><th>prediccion</th><th>limite_inferior</th><th>limite_superior</th></tr></thead>
-    <tbody id="filas"></tbody>
-  </table>
+  <main class="page">
+    <header class="topline">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 16.5 8.2 11l4 3.5L20.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15.5 6h5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-name">Pulso · Series de tiempo</span>
+      </div>
+      <span class="timezone">Hora local · Colombia</span>
+    </header>
 
-<script>
-async function cargar() {
-  const estado = document.getElementById("estado");
-  try {
-    const respuesta = await fetch("/api/prediccion?horas=12&historia=48");
-    const datos = await respuesta.json();
-    if (!respuesta.ok) throw new Error(datos.detail);
+    <section class="heading-row" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Monitoreo y proyección</p>
+        <h1 id="page-title">Pronóstico horario</h1>
+        <p class="intro">Explora el comportamiento reciente y las próximas horas esperadas.</p>
+      </div>
+      <form class="controls" id="controles">
+        <label for="horas">Pronosticar</label>
+        <div class="slider-wrap">
+          <input id="horas" type="range" min="1" max="72" step="1" value="12" aria-describedby="horas-valor">
+          <output class="hours-value" id="horas-valor" for="horas">12 h</output>
+        </div>
+        <button class="refresh" id="actualizar" type="submit">Actualizar</button>
+      </form>
+    </section>
 
-    // datos.historico  -> [{tiempo, valor}, ...]            (horas pasadas)
-    // datos.prediccion -> [{tiempo, prediccion, limite_inferior, limite_superior}, ...]
-    console.log(datos);   // abre la consola del navegador (F12) para explorarlo
+    <section class="metrics" aria-label="Indicadores del pronóstico">
+      <article class="metric">
+        <p class="metric-label">Próxima hora</p>
+        <p class="metric-value" id="proxima">—</p>
+      </article>
+      <article class="metric">
+        <p class="metric-label">Máximo esperado</p>
+        <p class="metric-value" id="maximo">—</p>
+      </article>
+      <article class="metric">
+        <p class="metric-label">Último dato real</p>
+        <p class="metric-value" id="ultimo">—</p>
+      </article>
+    </section>
 
-    document.getElementById("filas").innerHTML = datos.prediccion.map(p =>
-      `<tr><td>${p.tiempo}</td><td>${p.prediccion}</td><td>${p.limite_inferior}</td><td>${p.limite_superior}</td></tr>`
-    ).join("");
-    estado.textContent = `Último dato real: ${datos.ultima_observacion}`;
-  } catch (error) {
-    estado.textContent = "Error: " + error.message;
-  }
-}
-cargar();
-</script>
+    <section class="chart-card" aria-labelledby="chart-title">
+      <div class="chart-head">
+        <div>
+          <h2 id="chart-title">Histórico y pronóstico</h2>
+          <p class="chart-caption">La franja sombreada representa el intervalo de confianza del 95 %.</p>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="grafica" role="img" aria-label="Gráfica del histórico, pronóstico e intervalo de confianza"></canvas>
+      </div>
+    </section>
+    <p class="status" id="estado" role="status" aria-live="polite">Consultando el pronóstico…</p>
+  </main>
 </body>
 </html>
