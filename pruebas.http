@@ -16,3 +16,6 @@ GET {{base}}/api/modelo
 
 ### Recargar el modelo después de git pull
 POST {{base}}/api/modelo/recargar
+
+GET /api/prediccion?horas=12&historia=48&confianza=0.95
+
