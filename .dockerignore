@@ -1,0 +1,17 @@
+.env
+
+.git
+.gitignore
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+notebooks/
+
+.vscode/
+
+.ipynb_checkpoints/
+
+.DS_Store
