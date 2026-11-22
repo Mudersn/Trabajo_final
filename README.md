@@ -1,6 +1,8 @@
 # Proyecto final · Pronóstico de series de tiempo en producción
-##**video de pronostico final**
+
+## **video de pronostico final**
 https://youtu.be/PgydXQ5D7Jw
+
 **Computación Avanzada — Cierre del curso**
 
 Vas a construir un servicio web que pronostica las próximas horas de una variable medida por sensores. Los datos vienen de **InfluxDB**, el modelo es un **SARIMA** que tú entrenas en **Google Colab**, la API está hecha en **FastAPI** y todo corre en **GitHub Codespaces**. Al final lo empaquetas en un **contenedor Docker**.
